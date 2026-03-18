@@ -328,26 +328,26 @@ const Home = () => {
              </div>
           </div>
 
-          {/* Right Side: Scrollable imagery (Placeholder for large app screenshots) */}
+          {/* Right Side: Scrollable imagery (Actual App Screenshots) */}
           <div style={{ padding: '20vh 4vw', display: 'flex', flexDirection: 'column', gap: '20vh' }}>
-             <motion.div 
+             <motion.img 
+               src="/dashboard_preview.png"
+               alt="AgriLease Dashboard"
                initial={{ opacity: 0, y: 100 }}
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: false, margin: "-20%" }}
                transition={{ duration: 0.8 }}
-               style={{ width: '100%', paddingBottom: '120%', backgroundColor: '#D8D4CA', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-             >
-                <span style={{ opacity: 0.3, letterSpacing: '2px', fontSize: '0.85rem', fontWeight: 600 }}>DASHBOARD PREVIEW</span>
-             </motion.div>
-             <motion.div 
+               style={{ width: '100%', objectFit: 'cover', borderRadius: '16px', boxShadow: '0 30px 60px rgba(0,0,0,0.15)', border: '1px solid var(--grid-line)' }}
+             />
+             <motion.img 
+               src="/discovery_preview.png"
+               alt="AgriLease Discovery Grid"
                initial={{ opacity: 0, y: 100 }}
                whileInView={{ opacity: 1, y: 0 }}
                viewport={{ once: false, margin: "-20%" }}
                transition={{ duration: 0.8 }}
-               style={{ width: '100%', paddingBottom: '120%', backgroundColor: '#D8D4CA', borderRadius: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-             >
-                <span style={{ opacity: 0.3, letterSpacing: '2px', fontSize: '0.85rem', fontWeight: 600 }}>DISCOVERY PREVIEW</span>
-             </motion.div>
+               style={{ width: '100%', objectFit: 'cover', borderRadius: '16px', boxShadow: '0 30px 60px rgba(0,0,0,0.15)', border: '1px solid var(--grid-line)' }}
+             />
           </div>
 
         </div>

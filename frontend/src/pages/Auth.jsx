@@ -21,7 +21,7 @@ const Auth = () => {
   };
 
   return (
-    <div className="auth-container" style={{ display: 'flex', minHeight: 'calc(100vh - 80px)', paddingTop: '80px', paddingBottom: '4rem', paddingLeft: '4rem', paddingRight: '4rem', gap: '4rem', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="auth-container" style={{ display: 'flex', minHeight: 'calc(100vh - 120px)', paddingTop: '120px', paddingBottom: '4rem', paddingLeft: '4rem', paddingRight: '4rem', gap: '4rem', alignItems: 'center', justifyContent: 'center' }}>
 
       {/* Left Side Info Layer */}
       <motion.div 

@@ -7,6 +7,7 @@ import './forms.css';
 import Dashboard from './pages/Dashboard';
 import Discovery from './pages/Discovery';
 import Home from './pages/Home';
+import AIAssistant from './components/AIAssistant';
 
 // Layout Component
 const Layout = ({ children }) => {
@@ -44,6 +45,7 @@ const Layout = ({ children }) => {
       <main className="main-content">
         {children}
       </main>
+      <AIAssistant />
       <footer style={{ 
         background: 'var(--bg-card)', 
         borderTop: '1px solid var(--grid-line)',
