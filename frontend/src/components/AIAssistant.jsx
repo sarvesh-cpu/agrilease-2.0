@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Bot, User } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, User, ImagePlus } from 'lucide-react';
 
 const AIAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,6 +9,8 @@ const AIAssistant = () => {
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
@@ -19,13 +21,31 @@ const AIAssistant = () => {
     scrollToBottom();
   }, [messages, isTyping]);
 
+  const handleImageSelect = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert("Image size should be less than 5MB");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !selectedImage) return;
 
     const userMessage = input;
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }]);
+    const imageToSend = selectedImage;
+    
+    setMessages(prev => [...prev, { role: 'user', content: userMessage, image: imageToSend }]);
     setInput('');
+    setSelectedImage(null);
     setIsTyping(true);
 
     try {
@@ -33,7 +53,7 @@ const AIAssistant = () => {
       const res = await fetch(`${apiUrl}/api/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ message: userMessage, image: imageToSend })
       });
       const data = await res.json();
       
@@ -174,6 +194,13 @@ const AIAssistant = () => {
                     border: msg.role === 'ai' ? '1px solid var(--grid-line)' : 'none',
                     boxShadow: '0 2px 5px rgba(0,0,0,0.05)'
                   }}>
+                    {msg.image && (
+                      <img 
+                        src={msg.image} 
+                        alt="Uploaded land" 
+                        style={{ maxWidth: '100%', borderRadius: '8px', marginBottom: msg.content ? '0.5rem' : '0' }}
+                      />
+                    )}
                     {msg.content}
                   </div>
                 </motion.div>
@@ -190,53 +217,96 @@ const AIAssistant = () => {
             </div>
 
             {/* Input Area */}
-            <form 
-              onSubmit={handleSend}
-              style={{
-                padding: '1rem',
-                borderTop: '1px solid var(--grid-line)',
-                background: 'white',
-                display: 'flex',
-                gap: '0.5rem'
-              }}
-            >
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about lands, pricing..."
+            <div style={{
+              background: 'white',
+              borderTop: '1px solid var(--grid-line)',
+              display: 'flex',
+              flexDirection: 'column'
+            }}>
+              {selectedImage && (
+                <div style={{ padding: '0.8rem 1rem 0 1rem', position: 'relative' }}>
+                  <img src={selectedImage} alt="Preview" style={{ height: '60px', borderRadius: '8px', objectFit: 'cover' }} />
+                  <button 
+                    onClick={() => setSelectedImage(null)}
+                    style={{ position: 'absolute', top: '0.5rem', left: '0.5rem', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', borderRadius: '50%', padding: '2px', cursor: 'pointer' }}
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              )}
+              <form 
+                onSubmit={handleSend}
                 style={{
-                  flex: 1,
-                  padding: '0.8rem 1rem',
-                  border: '1px solid var(--grid-line)',
-                  borderRadius: '99px',
-                  background: 'var(--bg-main)',
-                  outline: 'none',
-                  fontSize: '0.9rem',
-                  fontFamily: 'var(--font-main)'
-                }}
-              />
-              <button
-                type="submit"
-                disabled={!input.trim() || isTyping}
-                style={{
-                  background: 'var(--fm-olive)',
-                  color: 'var(--fm-beige)',
-                  border: 'none',
-                  borderRadius: '50%',
-                  width: '45px',
-                  height: '45px',
+                  padding: '1rem',
                   display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: input.trim() && !isTyping ? 'pointer' : 'not-allowed',
-                  opacity: input.trim() && !isTyping ? 1 : 0.5,
-                  transition: 'all 0.3s'
+                  gap: '0.5rem',
+                  alignItems: 'center'
                 }}
               >
-                <Send size={18} />
-              </button>
-            </form>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  ref={fileInputRef} 
+                  onChange={handleImageSelect} 
+                  style={{ display: 'none' }} 
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  style={{
+                    background: 'var(--bg-main)',
+                    color: 'var(--text-main)',
+                    border: '1px solid var(--grid-line)',
+                    borderRadius: '50%',
+                    width: '40px',
+                    height: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s'
+                  }}
+                >
+                  <ImagePlus size={18} />
+                </button>
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about lands, upload image..."
+                  style={{
+                    flex: 1,
+                    padding: '0.8rem 1rem',
+                    border: '1px solid var(--grid-line)',
+                    borderRadius: '99px',
+                    background: 'var(--bg-main)',
+                    outline: 'none',
+                    fontSize: '0.9rem',
+                    fontFamily: 'var(--font-main)'
+                  }}
+                />
+                <button
+                  type="submit"
+                  disabled={(!input.trim() && !selectedImage) || isTyping}
+                  style={{
+                    background: 'var(--fm-olive)',
+                    color: 'var(--fm-beige)',
+                    border: 'none',
+                    borderRadius: '50%',
+                    width: '45px',
+                    height: '45px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: (!input.trim() && !selectedImage) || isTyping ? 'not-allowed' : 'pointer',
+                    opacity: (!input.trim() && !selectedImage) || isTyping ? 0.5 : 1,
+                    transition: 'all 0.3s'
+                  }}
+                >
+                  <Send size={18} />
+                </button>
+              </form>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

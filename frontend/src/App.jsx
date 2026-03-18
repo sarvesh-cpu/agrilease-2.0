@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Leaf, Shield, LayoutDashboard, Search, Home as HomeIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import './index.css';
 import './forms.css';
 import Dashboard from './pages/Dashboard';
@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import AIAssistant from './components/AIAssistant';
+import Preloader from './components/Preloader';
 
 // Layout Component
 const Layout = ({ children }) => {
@@ -110,18 +111,25 @@ const Layout = ({ children }) => {
 // Replaced placeholder HomePage with imported Home component
 
 function App() {
+  const [loading, setLoading] = useState(true);
+
   return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/discovery" element={<Discovery />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-        </Routes>
-      </Layout>
-    </Router>
+    <>
+      <AnimatePresence mode="wait">
+        {loading && <Preloader onComplete={() => setLoading(false)} />}
+      </AnimatePresence>
+      <Router>
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/discovery" element={<Discovery />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+          </Routes>
+        </Layout>
+      </Router>
+    </>
   );
 }
 
