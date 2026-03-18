@@ -15,6 +15,12 @@ const Discovery = () => {
       { id: 1, type: 'Agricultural', area: 10.5, price: 15000, location: 'Pune, Maharashtra', duration: '1 Year', image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=800&auto=format&fit=crop' },
       { id: 2, type: 'Orchard', area: 3.2, price: 25000, location: 'Nashik, Maharashtra', duration: '3 Years', image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?q=80&w=800&auto=format&fit=crop' },
       { id: 3, type: 'Agricultural', area: 15.0, price: 12000, location: 'Solapur, Maharashtra', duration: '5 Years', image: 'https://images.unsplash.com/photo-1586771107445-d3ca888129ff?q=80&w=800&auto=format&fit=crop' },
+      { id: 4, type: 'Vineyard', area: 5.5, price: 30000, location: 'Baramati, Maharashtra', duration: '2 Years', image: 'https://images.unsplash.com/photo-1596434449830-ec62372d67d7?q=80&w=800&auto=format&fit=crop' },
+      { id: 5, type: 'Greenhouse Ready', area: 2.0, price: 40000, location: 'Satara, Maharashtra', duration: '1 Year', image: 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?q=80&w=800&auto=format&fit=crop' },
+      { id: 6, type: 'Agricultural', area: 20.0, price: 10000, location: 'Ahmednagar, Maharashtra', duration: '10 Years', image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=800&auto=format&fit=crop' },
+      { id: 7, type: 'Dairy Farm Ready', area: 8.0, price: 18000, location: 'Kolhapur, Maharashtra', duration: '5 Years', image: 'https://images.unsplash.com/photo-1508247000216-728b5eac88b1?q=80&w=800&auto=format&fit=crop' },
+      { id: 8, type: 'Orchard', area: 4.5, price: 22000, location: 'Jalgaon, Maharashtra', duration: '3 Years', image: 'https://images.unsplash.com/photo-1592079927431-3f8ced0e97ab?q=80&w=800&auto=format&fit=crop' },
+      { id: 9, type: 'Agricultural', area: 12.0, price: 14000, location: 'Sangli, Maharashtra', duration: '2 Years', image: 'https://images.unsplash.com/photo-1464226184884-fa280b87c399?q=80&w=800&auto=format&fit=crop' },
     ]);
   }, []);
 

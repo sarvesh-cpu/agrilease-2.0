@@ -27,6 +27,9 @@ const db = new sqlite3.Database(dbPath, (err) => {
         const stmtLands = db.prepare("INSERT INTO lands (ownerId, surveyNumber, area, location, landType, pricePerAcre, leaseDuration, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         stmtLands.run(1, "SV-101", 10.5, "Pune, Maharashtra", "Agricultural", 15000, "1 Year", "approved");
         stmtLands.run(1, "SV-102", 5.0, "Nashik, Maharashtra", "Agricultural", 20000, "2 Years", "pending");
+        stmtLands.run(1, "SV-409", 2.5, "Satara, Maharashtra", "Greenhouse Ready", 40000, "1 Year", "approved");
+        stmtLands.run(1, "SV-821", 15.0, "Solapur, Maharashtra", "Agricultural", 12000, "5 Years", "rejected");
+        stmtLands.run(1, "SV-211", 8.0, "Kolhapur, Maharashtra", "Dairy Farm Ready", 18000, "5 Years", "approved");
         stmtLands.finalize();
 
         console.log("Seeding complete. Use Ctrl+C if script doesn't exit automatically.");

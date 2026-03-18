@@ -25,7 +25,10 @@ const LandListings = ({ user }) => {
     // but for UI flow, let's inject a mock until we hook up full Axios calls
     setLands([
       { id: 1, surveyNumber: "SV-101", area: 10.5, location: "Pune, Maharashtra", status: "approved" },
-      { id: 2, surveyNumber: "SV-102", area: 5.0, location: "Nashik, Maharashtra", status: "pending" }
+      { id: 2, surveyNumber: "SV-102", area: 5.0, location: "Nashik, Maharashtra", status: "pending" },
+      { id: 3, surveyNumber: "SV-409", area: 2.5, location: "Satara, Maharashtra", status: "approved" },
+      { id: 4, surveyNumber: "SV-821", area: 15.0, location: "Solapur, Maharashtra", status: "rejected" },
+      { id: 5, surveyNumber: "SV-211", area: 8.0, location: "Kolhapur, Maharashtra", status: "approved" }
     ]);
   }, []);
 

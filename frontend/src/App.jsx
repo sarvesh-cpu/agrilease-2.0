@@ -7,6 +7,8 @@ import './forms.css';
 import Dashboard from './pages/Dashboard';
 import Discovery from './pages/Discovery';
 import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import AIAssistant from './components/AIAssistant';
 
 // Layout Component
@@ -40,6 +42,7 @@ const Layout = ({ children }) => {
         <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', gap: '2rem', color: 'var(--fm-beige)', fontSize: '0.85rem', fontWeight: 600, letterSpacing: '0.5px' }}>
           <Link to="/discovery" style={{ color: 'inherit', textDecoration: 'none' }}>DISCOVER</Link>
           <Link to="/dashboard" style={{ color: 'inherit', textDecoration: 'none' }}>DASHBOARD</Link>
+          <Link to="/login" style={{ color: 'var(--primary)', background: 'var(--bg-main)', padding: '0.4rem 1.2rem', borderRadius: '50px', textDecoration: 'none', mixBlendMode: 'normal' }}>LOGIN</Link>
         </div>
       </nav>
       <main className="main-content">
@@ -53,7 +56,8 @@ const Layout = ({ children }) => {
       }}>
         <div style={{ 
           display: 'grid', 
-          gridTemplateColumns: 'repeat(4, 1fr)', 
+          gridTemplateColumns: '2fr 1fr 1fr', 
+          gap: '2rem',
           maxWidth: '100%', 
           marginBottom: '6rem'
         }}>
@@ -62,29 +66,25 @@ const Layout = ({ children }) => {
               <Leaf size={32} style={{ marginBottom: '0.5rem' }} />
               <span style={{ fontSize: '1.5rem', fontWeight: 500, letterSpacing: '-0.5px' }}>AgriLease</span>
             </div>
-          </div>
-          
-          <div style={{ paddingLeft: '2rem', borderLeft: '1px solid var(--grid-line)' }}>
-            <h4 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', fontSize: '0.85rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Platform</h4>
-            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '1.1rem' }}>
-              <li><Link to="/discovery" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>Browse Lands</Link></li>
-              <li><Link to="/dashboard" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>List Land</Link></li>
-            </ul>
+            <div style={{ marginTop: '2rem', color: 'var(--text-muted)', fontSize: '1.1rem', lineHeight: 1.6 }}>
+              <p><strong>Team:</strong> Vidhi, Harshita, Vedant, Sarvesh</p>
+              <p><strong>Contact:</strong> sarveshkasar1210@gmail.com</p>
+            </div>
           </div>
           
           <div style={{ paddingLeft: '2rem', borderLeft: '1px solid var(--grid-line)' }}>
             <h4 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', fontSize: '0.85rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Legal</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '1.1rem' }}>
               <li><a href="#" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>Privacy Policy</a></li>
-              <li><a href="#" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>Terms of Service</a></li>
+              <li><a href="#" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>Terms</a></li>
             </ul>
           </div>
-          
+
           <div style={{ paddingLeft: '2rem', borderLeft: '1px solid var(--grid-line)' }}>
-            <h4 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', fontSize: '0.85rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Support</h4>
+            <h4 style={{ color: 'var(--text-main)', marginBottom: '1.5rem', fontSize: '0.85rem', letterSpacing: '0.5px', textTransform: 'uppercase' }}>Platform</h4>
             <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.8rem', fontSize: '1.1rem' }}>
-              <li><a href="#" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>About Us</a></li>
-              <li><a href="#" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>Contact Us</a></li>
+              <li><Link to="/discovery" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>Discover</Link></li>
+              <li><Link to="/dashboard" style={{ color: 'var(--text-main)', textDecoration: 'none' }}>Dashboard</Link></li>
             </ul>
           </div>
         </div>
@@ -117,6 +117,8 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/discovery" element={<Discovery />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
         </Routes>
       </Layout>
     </Router>
