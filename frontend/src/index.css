@@ -1,0 +1,327 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* Exact Farm Minerals Theme */
+  --fm-beige: #E5E1D8;
+  --fm-olive: #283018; /* Darker elite olive */
+  --fm-olive-light: #4B5320;
+
+  --bg-main: var(--fm-beige);
+  --bg-card: var(--fm-beige);
+  --primary: var(--fm-olive); 
+  --primary-glow: var(--fm-olive-light);
+  --secondary: #1A2010; 
+  
+  --text-main: #1A1A1A;
+  --text-muted: rgba(26,26,26,0.6);
+  --text-light: var(--fm-beige);
+  
+  --grid-line: rgba(0,0,0,0.06); /* Exact column dividers */
+  --grid-line-light: rgba(255,255,255,0.06); 
+  
+  --border-radius: 99px; /* Pill shapes preferred */
+  --font-main: 'Outfit', sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  overflow-x: hidden;
+  /* Exact 8-column layout grid */
+  background-image: 
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px);
+  background-size: 12.5vw 100%; /* 100vw / 8 columns = 12.5vw */
+  background-position: center top;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Page Layouts */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.main-content {
+  min-height: calc(100vh - 140px);
+  display: flex;
+  flex-direction: column;
+}
+
+.page {
+  flex: 1;
+  padding: 3rem 4rem;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Navigation - Structural */
+.glass-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 4rem;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--grid-line);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-main);
+}
+
+.nav-links {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+}
+
+.nav-link {
+  color: var(--text-main);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.2px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: opacity 0.3s ease;
+}
+
+.nav-link:hover {
+  opacity: 0.7;
+}
+
+/* Structural Components */
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--grid-line);
+  padding: 2.5rem;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+
+
+.card-3d-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 30px rgba(78, 97, 49, 0.1);
+  border-color: var(--primary);
+}
+
+/* Typography styles */
+.hero-title {
+  font-size: 5.5rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -2px;
+  color: var(--text-main);
+}
+.hero-title span {
+  color: var(--primary);
+}
+
+.hero-subtitle {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  max-width: 600px;
+  line-height: 1.5;
+  font-weight: 500;
+  letter-spacing: -0.2px;
+  margin-top: 1.5rem;
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.8rem 1.8rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  border: 1px solid var(--primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover {
+  background: var(--text-main);
+  border-color: var(--text-main);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--text-main);
+  padding: 0.8rem 1.8rem;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background: rgba(26, 26, 26, 0.05);
+}
+
+.large {
+  padding: 1rem 2.5rem;
+  font-size: 1.05rem;
+}
+
+/* Badges */
+.badge {
+  background: transparent;
+  border: 1px solid var(--grid-line);
+  color: var(--text-main);
+  padding: 0.4rem 1rem;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.badge.verified {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: rgba(78, 97, 49, 0.05);
+}
+.badge.pending {
+  border-color: #D6A848;
+  color: #D6A848;
+  background: rgba(214, 168, 72, 0.05);
+}
+
+.hero-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 80px); /* 80px for nav */
+}
+
+.hero-content {
+  text-align: center;
+  max-width: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg-card); /* added background since glass-card is removed from hero */
+  padding: 4rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--grid-line);
+  position: relative;
+  z-index: 2;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+
+.glass-footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--grid-line);
+  background: var(--bg-main);
+}
+
+/* Auth Specific overrides */
+.auth-container {
+  display: flex;
+  min-height: calc(100vh - 100px);
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 4rem;
+  gap: 6rem;
+}
+
+.auth-info {
+  flex: 1;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  z-index: 10;
+}
+
+.auth-form-container {
+  flex: 1;
+  max-width: 480px;
+  z-index: 10;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Background elements imitating Farm Minerals */
+.floating-shape {
+  position: absolute;
+  filter: blur(80px);
+  z-index: 0;
+  opacity: 0.15;
+}
+
+.shape-1 {
+  width: 400px;
+  height: 400px;
+  background: var(--secondary);
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  animation: float 12s infinite ease-in-out;
+}
+
+.shape-2 {
+  width: 500px;
+  height: 500px;
+  background: var(--primary);
+  bottom: 0;
+  right: 0;
+  border-radius: 50%;
+  animation: float 15s infinite ease-in-out reverse;
+}
+
+/* Typography Overrides */
+h1, h2, h3, h4, h5, h6 {
+  letter-spacing: -0.5px;
+}
