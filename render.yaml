@@ -5,10 +5,6 @@ services:
     rootDir: backend
     buildCommand: npm install
     startCommand: node server.js
-    disk:
-      name: sqlite-data
-      mountPath: /opt/render/project/src/backend
-      sizeGB: 1
     envVars:
       - key: NODE_VERSION
         value: 20.x
