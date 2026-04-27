@@ -325,3 +325,150 @@ body {
 h1, h2, h3, h4, h5, h6 {
   letter-spacing: -0.5px;
 }
+
+/* ═══ Button System ═══ */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: var(--primary);
+  color: var(--fm-beige);
+  border: none;
+  border-radius: 99px;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  letter-spacing: 0.3px;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+.btn-primary.large {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.8rem 1.5rem;
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--grid-line);
+  border-radius: 99px;
+  font-family: var(--font-main);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.btn-secondary:hover {
+  background: rgba(0,0,0,0.03);
+}
+
+/* ═══ Form Elements ═══ */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.input-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-main);
+  letter-spacing: 0.5px;
+}
+.input-group input,
+.input-group select {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--grid-line);
+  border-radius: 12px;
+  background: var(--bg-main);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  color: var(--text-main);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.input-group input:focus,
+.input-group select:focus {
+  border-color: var(--primary);
+}
+
+/* ═══ Spin Animation ═══ */
+.spin {
+  animation: spin 1.2s linear infinite;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ═══ Responsive ═══ */
+@media (max-width: 900px) {
+  .fm-nav {
+    padding: 1rem 1.5rem !important;
+  }
+  .page {
+    padding: 6rem 1.5rem 3rem !important;
+  }
+  .nav-right {
+    display: none !important;
+  }
+  .nav-left {
+    display: none !important;
+  }
+  .mobile-menu-toggle {
+    display: flex !important;
+  }
+  .footer-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+  .footer-grid > div {
+    padding-left: 0 !important;
+    border-left: none !important;
+    border-top: 1px solid var(--grid-line);
+    padding-top: 1.5rem;
+  }
+  .footer-grid > div:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+  h1 {
+    font-size: 2.2rem !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 5rem 1rem 2rem !important;
+  }
+  h1 {
+    font-size: 1.8rem !important;
+  }
+}
+
+/* ═══ Print / PDF Export ═══ */
+@media print {
+  .fm-nav, footer, .mobile-menu-toggle, .btn-primary, .btn-secondary {
+    display: none !important;
+  }
+  .page {
+    padding: 1rem !important;
+  }
+  body {
+    background: white !important;
+    color: #111 !important;
+  }
+  * {
+    box-shadow: none !important;
+    border-color: #ddd !important;
+  }
+}

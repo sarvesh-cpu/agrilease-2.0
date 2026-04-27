@@ -1,145 +1,79 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, Lock, Phone, UserCheck, Briefcase, ShieldCheck, FileSignature } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { UserPlus, Lock, Phone, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 
 const Signup = () => {
-  const [role, setRole] = useState('lessee');
   const navigate = useNavigate();
+  const [form, setForm] = useState({ name: '', phone: '', password: '', confirmPassword: '' });
+  const [showPass, setShowPass] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    localStorage.setItem('user', JSON.stringify({
-      role: role,
-      isVerified: true, 
-      name: 'New User'
-    }));
-    navigate('/dashboard');
+    if (!form.name || !form.phone || !form.password) { setError('Name, phone, and password are required'); return; }
+    if (form.password.length < 4) { setError('Password must be at least 4 characters'); return; }
+    if (form.password !== form.confirmPassword) { setError('Passwords do not match'); return; }
+    setLoading(true); setError('');
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/users/register`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: form.name, phone: form.phone, password: form.password })
+      });
+      const data = await res.json();
+      if (res.ok && data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        navigate('/dashboard');
+      } else { setError(data.error || 'Registration failed'); }
+    } catch (err) { setError('Server unavailable.'); }
+    finally { setLoading(false); }
   };
 
   return (
-    <div className="auth-container" style={{ display: 'flex', minHeight: 'calc(100vh - 120px)', paddingTop: '120px', paddingBottom: '4rem', paddingLeft: '4rem', paddingRight: '4rem', gap: '4rem', alignItems: 'center', justifyContent: 'center' }}>
-
-      {/* Left Side Info Layer */}
-      <motion.div 
-        className="auth-info"
-        style={{ flex: 1, maxWidth: '600px' }}
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.6 }}
-      >
-        <h1 style={{ fontSize: '4.5rem', fontWeight: 800, color: 'var(--fm-olive)', lineHeight: 1, letterSpacing: '-2px', marginBottom: '1.5rem' }}>
-          Secure,<br/>Transparent<br/>Leasing.
-        </h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-          Join thousands of landowners and lessees scaling Indian agriculture through verified digital agreements and escrow-secured payments.
-        </p>
-        
-        <div style={{ display: 'flex', gap: '2rem', marginTop: '2.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ background: 'var(--primary)', padding: '0.8rem', borderRadius: '50%', color: 'var(--fm-beige)' }}>
-              <ShieldCheck size={24} />
-            </div>
-            <div>
-              <h4 style={{ color: 'var(--text-main)', fontWeight: 700 }}>100% Secure</h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Escrow Payments</p>
-            </div>
+    <motion.div className="page" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '85vh' }}>
+      <div style={{ width: '100%', maxWidth: '420px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+          <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'var(--primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1rem' }}>
+            <UserPlus size={24} color="var(--fm-beige)" />
           </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div style={{ background: 'var(--primary)', padding: '0.8rem', borderRadius: '50%', color: 'var(--fm-beige)' }}>
-              <FileSignature size={24} />
-            </div>
-            <div>
-              <h4 style={{ color: 'var(--text-main)', fontWeight: 700 }}>Legal Safety</h4>
-              <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Digital Agreements</p>
-            </div>
-          </div>
+          <h1 style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--fm-olive)', marginBottom: '0.5rem' }}>Create Account</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Start making data-driven crop decisions</p>
         </div>
-      </motion.div>
-
-      {/* Right Side Form Layer */}
-      <div className="auth-form-container" style={{ flex: 1, maxWidth: '500px' }}>
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, type: 'spring' }}
-          style={{ width: '100%', background: 'transparent', border: '1px solid var(--grid-line)', padding: '3rem', borderRadius: 'var(--border-radius)' }}
-        >
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <h2 style={{ fontSize: '2rem', color: 'var(--text-main)' }}>Create Account</h2>
-            <p style={{ color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-              Join AgriLease to list or find land
-            </p>
+        <form onSubmit={handleSubmit} style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '20px', padding: '2rem' }}>
+          {error && <div style={{ padding: '0.7rem 1rem', background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', borderRadius: '12px', color: '#ef4444', fontSize: '0.85rem', marginBottom: '1rem' }}>{error}</div>}
+          <div className="input-group" style={{ marginBottom: '1rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Full Name *</label>
+            <div style={{ position: 'relative' }}><User size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input type="text" placeholder="Rahul Patil" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={{ paddingLeft: '2.8rem' }} /></div>
           </div>
-
-          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
-            
-            <div className="input-group">
-              <label>Full Name</label>
-              <div className="input-wrapper">
-                <User size={18} className="input-icon" />
-                <input type="text" placeholder="John Doe" required />
-              </div>
-            </div>
-
-            <div className="input-group">
-              <label>Phone Number</label>
-              <div className="input-wrapper">
-                <Phone size={18} className="input-icon" />
-                <input type="tel" placeholder="9876543210" required />
-              </div>
-            </div>
-
-            <div className="input-group">
-              <label>Password</label>
-              <div className="input-wrapper">
-                <Lock size={18} className="input-icon" />
-                <input type="password" placeholder="••••••••" required />
-              </div>
-            </div>
-
-            <div className="role-selector">
-              <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-muted)', fontSize: '0.9rem' }}>I want to...</label>
-              <div style={{ display: 'flex', gap: '1rem' }}>
-                <button 
-                  type="button" 
-                  className={`role-btn ${role === 'lessee' ? 'active' : ''}`}
-                  onClick={() => setRole('lessee')}
-                >
-                  <UserCheck size={20} />
-                  Lease Land
-                </button>
-                <button 
-                  type="button" 
-                  className={`role-btn ${role === 'landowner' ? 'active' : ''}`}
-                  onClick={() => setRole('landowner')}
-                >
-                  <Briefcase size={20} />
-                  List Land
-                </button>
-              </div>
-            </div>
-
-            <button type="submit" className="btn-primary large" style={{ width: '100%', marginTop: '1rem' }}>
-              Create Account
-            </button>
-          </form>
-
-          <div style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--text-muted)' }}>
-            Already have an account? {' '}
-            <span 
-              onClick={() => navigate('/login')} 
-              style={{ color: 'var(--primary)', cursor: 'pointer', fontWeight: '600', textDecoration: 'underline' }}
-            >
-              Login
-            </span>
+          <div className="input-group" style={{ marginBottom: '1rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Phone Number *</label>
+            <div style={{ position: 'relative' }}><Phone size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input type="tel" placeholder="9876543210" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} style={{ paddingLeft: '2.8rem' }} /></div>
           </div>
-
-        </motion.div>
+          <div className="input-group" style={{ marginBottom: '1rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Password *</label>
+            <div style={{ position: 'relative' }}><Lock size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input type={showPass ? 'text' : 'password'} placeholder="Min 4 characters" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} style={{ paddingLeft: '2.8rem', paddingRight: '2.8rem' }} />
+            <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: '0.8rem', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}>{showPass ? <EyeOff size={16} /> : <Eye size={16} />}</button></div>
+          </div>
+          <div className="input-group" style={{ marginBottom: '1.5rem' }}>
+            <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Confirm Password *</label>
+            <div style={{ position: 'relative' }}><Lock size={16} style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }} />
+            <input type="password" placeholder="••••••••" value={form.confirmPassword} onChange={e => setForm({ ...form, confirmPassword: e.target.value })} style={{ paddingLeft: '2.8rem' }} /></div>
+          </div>
+          <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', padding: '0.9rem', opacity: loading ? 0.6 : 1 }}>
+            {loading ? 'Creating account...' : <><UserPlus size={18} /> Create Account</>}
+          </button>
+          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+            Already have an account? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600, textDecoration: 'none' }}>Log in <ArrowRight size={14} style={{ verticalAlign: 'middle' }} /></Link>
+          </p>
+        </form>
       </div>
-    </div>
+    </motion.div>
   );
 };
-
 export default Signup;

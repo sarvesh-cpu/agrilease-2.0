@@ -14,6 +14,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         fullName TEXT NOT NULL,
         phone TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL DEFAULT '',
         role TEXT NOT NULL, -- 'landowner', 'lessee', 'admin'
         aadhaar TEXT,
         pan TEXT,
@@ -22,7 +23,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
       )`);
 
-      // Create Lands Table
+      // Create Lands Table (original leasing)
       db.run(`CREATE TABLE IF NOT EXISTS lands (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         ownerId INTEGER NOT NULL,
@@ -34,9 +35,46 @@ const db = new sqlite3.Database(dbPath, (err) => {
         pricePerAcre REAL NOT NULL,
         leaseDuration TEXT NOT NULL,
         documentUrl TEXT,
-        status TEXT DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
+        status TEXT DEFAULT 'pending',
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (ownerId) REFERENCES users (id)
+      )`);
+
+      // Create Land Profiles Table (for crop analysis)
+      db.run(`CREATE TABLE IF NOT EXISTS land_profiles (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER,
+        name TEXT DEFAULT 'My Land',
+        district TEXT NOT NULL,
+        taluka TEXT NOT NULL,
+        area REAL NOT NULL,
+        soilType TEXT NOT NULL,
+        irrigationType TEXT NOT NULL,
+        previousCrop TEXT,
+        season TEXT NOT NULL,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (userId) REFERENCES users (id)
+      )`);
+
+      // Create Analysis Results Table
+      db.run(`CREATE TABLE IF NOT EXISTS analysis_results (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        landProfileId INTEGER NOT NULL,
+        recommendations TEXT NOT NULL,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (landProfileId) REFERENCES land_profiles (id)
+      )`);
+
+      // Create Chat Sessions Table (Conversation Memory)
+      db.run(`CREATE TABLE IF NOT EXISTS chat_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER NOT NULL,
+        role TEXT NOT NULL,
+        message TEXT NOT NULL,
+        activeLandId INTEGER,
+        createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (userId) REFERENCES users (id),
+        FOREIGN KEY (activeLandId) REFERENCES land_profiles (id)
       )`);
 
       // Create LeaseRequests Table
@@ -45,7 +83,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
         landId INTEGER NOT NULL,
         lesseeId INTEGER NOT NULL,
         ownerId INTEGER NOT NULL,
-        status TEXT DEFAULT 'pending', -- 'pending', 'accepted', 'rejected'
+        status TEXT DEFAULT 'pending',
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (landId) REFERENCES lands (id),
         FOREIGN KEY (lesseeId) REFERENCES users (id),
@@ -68,8 +106,8 @@ const db = new sqlite3.Database(dbPath, (err) => {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         agreementId INTEGER NOT NULL,
         amount REAL NOT NULL,
-        type TEXT NOT NULL, -- 'token', 'full'
-        status TEXT DEFAULT 'held', -- 'held', 'released'
+        type TEXT NOT NULL,
+        status TEXT DEFAULT 'held',
         createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (agreementId) REFERENCES agreements (id)
       )`);

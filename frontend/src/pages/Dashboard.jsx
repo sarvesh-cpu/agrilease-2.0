@@ -1,201 +1,315 @@
-import { useState, useEffect } from 'react';
-import { Upload, CheckCircle, Clock, AlertTriangle, FileText } from 'lucide-react';
-import { motion } from 'framer-motion';
-import LandListings from '../components/LandListings';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ShieldCheck, FileText, MapPin, Settings, CreditCard, Plus, BarChart3, Sprout, Clock, Layers, Droplets, TrendingUp, ChevronRight } from 'lucide-react';
 import AdminDashboard from '../components/AdminDashboard';
+import LandListings from '../components/LandListings';
 
 const Dashboard = () => {
-  const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const name = user.name || user.fullName || 'Guest';
+  const role = user.role || 'All-Access';
+  const isAdmin = role === 'admin';
+  const isVerified = user.isVerified !== false;
+
+  const [analysisHistory, setAnalysisHistory] = useState([]);
+  const [landProfiles, setLandProfiles] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
 
   useEffect(() => {
-    // Mock user fetching from localStorage
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    } else {
-      setUser({ role: 'all-access', name: 'Guest', isVerified: true });
-    }
+    fetchHistory();
+    fetchLandProfiles();
   }, []);
 
-  if (!user) return <div className="page">Loading...</div>;
+  const fetchHistory = async () => {
+    setLoadingHistory(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/analysis/history`);
+      const data = await res.json();
+      setAnalysisHistory(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to fetch history:', err);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  const fetchLandProfiles = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const res = await fetch(`${apiUrl}/api/lands`);
+      const data = await res.json();
+      setLandProfiles(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error('Failed to fetch land profiles:', err);
+    }
+  };
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'analysis', label: 'Analysis History', icon: Clock },
+    ...(isAdmin ? [] : [{ id: 'verification', label: 'Verification Center', icon: ShieldCheck }]),
+    ...(isAdmin ? [] : [{ id: 'lands', label: 'My Lands', icon: FileText }]),
+    ...(isAdmin ? [] : [{ id: 'requests', label: 'My Requests', icon: MapPin }]),
+    ...(isAdmin ? [{ id: 'admin', label: 'All Transactions', icon: CreditCard }] : [{ id: 'transactions', label: 'All Transactions', icon: CreditCard }])
+  ];
+
+  const formatCurrency = (num) => {
+    if (num >= 100000) return `₹${(num / 100000).toFixed(1)}L`;
+    if (num >= 1000) return `₹${(num / 1000).toFixed(0)}K`;
+    return `₹${num}`;
+  };
 
   return (
-    <motion.div 
+    <motion.div
       className="page"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+      {/* Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h1 style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-1px', color: 'var(--fm-olive)', marginBottom: '0.5rem', lineHeight: 1 }}>Welcome, {user.name}</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Role: <span style={{ textTransform: 'capitalize', color: 'var(--primary)', fontWeight: 600 }}>{user.role}</span></p>
+          <h1 style={{ fontSize: '3rem', fontWeight: 800, letterSpacing: '-2px', color: 'var(--fm-olive)', lineHeight: 1, marginBottom: '0.3rem' }}>
+            Welcome, {name}
+          </h1>
+          <p style={{ color: 'var(--text-muted)', fontSize: '1rem' }}>
+            Role: <strong>{role}</strong>
+          </p>
         </div>
-        
-        {/* Verification Status Badge */}
-        <div className={`badge ${user.isVerified ? 'verified' : 'pending'}`}>
-          {user.isVerified ? <><CheckCircle size={16}/> Verified</> : <><Clock size={16}/> Pending Verification</>}
+        <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center' }}>
+          <Link to="/analyze" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={18} /> Analyze Land
+          </Link>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            padding: '0.5rem 1rem', border: '1px solid var(--grid-line)',
+            borderRadius: '99px', fontSize: '0.9rem', fontWeight: 600
+          }}>
+            {isVerified ? <ShieldCheck size={18} color="var(--primary)" /> : <ShieldCheck size={18} color="var(--text-muted)" />}
+            {isVerified ? 'Verified' : 'Pending'}
+          </div>
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '2rem' }}>
-        {/* Sidebar Nav */}
-        <div className="glass-card" style={{ width: '250px', height: 'fit-content', padding: '1.5rem' }}>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            <li>
-              <button 
-                className={`role-btn ${activeTab === 'overview' ? 'active' : ''}`}
-                onClick={() => setActiveTab('overview')}
-                style={{ width: '100%', justifyContent: 'flex-start' }}
-              >
-                Overview
-              </button>
-            </li>
-            <li>
-              <button 
-                className={`role-btn ${activeTab === 'verification' ? 'active' : ''}`}
-                onClick={() => setActiveTab('verification')}
-                style={{ width: '100%', justifyContent: 'flex-start' }}
-              >
-                Verification Center
-              </button>
-            </li>
-            <li>
-              <button 
-                className={`role-btn ${activeTab === 'listings' ? 'active' : ''}`}
-                onClick={() => setActiveTab('listings')}
-                style={{ width: '100%', justifyContent: 'flex-start' }}
-              >
-                My Lands
-              </button>
-            </li>
-            <li>
-              <button 
-                className={`role-btn ${activeTab === 'requests' ? 'active' : ''}`}
-                onClick={() => setActiveTab('requests')}
-                style={{ width: '100%', justifyContent: 'flex-start' }}
-              >
-                My Requests
-              </button>
-            </li>
-            <li>
-              <button 
-                className={`role-btn ${activeTab === 'transactions' ? 'active' : ''}`}
-                onClick={() => setActiveTab('transactions')}
-                style={{ width: '100%', justifyContent: 'flex-start' }}
-              >
-                All Transactions
-              </button>
-            </li>
-          </ul>
+      {/* Main Layout */}
+      <div style={{ display: 'grid', gridTemplateColumns: '280px 1fr', gap: '2rem', alignItems: 'start' }}>
+        {/* Sidebar */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={activeTab === tab.id ? 'btn-primary' : 'btn-secondary'}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '0.8rem',
+                padding: '1rem 1.2rem', textAlign: 'left', width: '100%',
+                justifyContent: 'flex-start'
+              }}
+            >
+              <tab.icon size={18} /> {tab.label}
+            </button>
+          ))}
         </div>
 
-        {/* Main Panel Content */}
-        <div className="glass-card" style={{ flex: 1, padding: '2rem' }}>
-          
-          {activeTab === 'overview' && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <h2 style={{ marginBottom: '1.5rem', color: 'var(--fm-olive)', fontSize: '1.8rem', letterSpacing: '-0.5px' }}>Dashboard Overview</h2>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.5rem' }}>
-                 <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '2.5rem', color: 'var(--primary)', letterSpacing: '-1px' }}>0</h3>
-                  <p style={{ color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', fontSize: '0.85rem', marginTop: '0.5rem' }}>Active Leases</p>
+        {/* Content */}
+        <div>
+          <AnimatePresence mode="wait">
+            {/* ─── OVERVIEW TAB ─── */}
+            {activeTab === 'overview' && (
+              <motion.div key="overview" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Dashboard Overview</h2>
+                
+                {/* Stats */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.2rem', marginBottom: '2.5rem' }}>
+                  {[
+                    { label: 'LAND PROFILES', value: landProfiles.length, icon: Layers },
+                    { label: 'ANALYSES RUN', value: analysisHistory.length, icon: BarChart3 },
+                    { label: 'ACTIVE LEASES', value: 0, icon: FileText }
+                  ].map((stat, i) => (
+                    <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '20px', padding: '1.5rem 2rem', textAlign: 'center' }}>
+                      <stat.icon size={24} style={{ color: 'var(--primary)', marginBottom: '0.5rem' }} />
+                      <div style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--text-main)', lineHeight: 1 }}>{stat.value}</div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 600, letterSpacing: '1px', color: 'var(--text-muted)', marginTop: '0.3rem' }}>{stat.label}</div>
+                    </div>
+                  ))}
                 </div>
-                <div className="glass-card" style={{ padding: '1.5rem', textAlign: 'center' }}>
-                  <h3 style={{ fontSize: '2.5rem', color: 'var(--primary)', letterSpacing: '-1px' }}>₹0</h3>
-                  <p style={{ color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase', fontSize: '0.85rem', marginTop: '0.5rem' }}>In Escrow</p>
+
+                {/* Recent Analyses */}
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--text-main)' }}>Recent Analyses</h3>
+                {analysisHistory.length === 0 ? (
+                  <div style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '20px', padding: '3rem', textAlign: 'center' }}>
+                    <BarChart3 size={48} style={{ color: 'var(--text-muted)', marginBottom: '1rem', opacity: 0.5 }} />
+                    <p style={{ color: 'var(--text-muted)', marginBottom: '1rem' }}>No analyses yet. Start your first land analysis!</p>
+                    <Link to="/analyze" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Plus size={18} /> Analyze My Land
+                    </Link>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+                    {analysisHistory.slice(0, 3).map((a, i) => (
+                      <div key={i} style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '16px', padding: '1.2rem 1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(40,48,24,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <Sprout size={20} color="var(--primary)" />
+                          </div>
+                          <div>
+                            <div style={{ fontWeight: 600, color: 'var(--text-main)' }}>{a.name || 'Land Analysis'}</div>
+                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '0.8rem', marginTop: '0.2rem' }}>
+                              <span>{a.district}, {a.taluka}</span>
+                              <span>•</span>
+                              <span>{a.area} acres</span>
+                              <span>•</span>
+                              <span>{a.soilType} soil</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                          {a.recommendations.slice(0, 3).map((r, j) => (
+                            <span key={j} style={{ fontSize: '1.4rem' }} title={r.name}>{r.icon}</span>
+                          ))}
+                          <ChevronRight size={18} color="var(--text-muted)" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ─── ANALYSIS HISTORY TAB ─── */}
+            {activeTab === 'analysis' && (
+              <motion.div key="analysis" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h2 style={{ fontSize: '1.8rem', fontWeight: 700, color: 'var(--text-main)', letterSpacing: '-0.5px' }}>Analysis History</h2>
+                  <Link to="/analyze" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.9rem' }}>
+                    <Plus size={16} /> New Analysis
+                  </Link>
                 </div>
-              </div>
-            </motion.div>
-          )}
 
-          {activeTab === 'verification' && (
-            <VerificationPanel user={user} setUser={setUser} />
-          )}
+                {loadingHistory ? (
+                  <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-muted)' }}>Loading...</div>
+                ) : analysisHistory.length === 0 ? (
+                  <div style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '20px', padding: '3rem', textAlign: 'center' }}>
+                    <Clock size={48} style={{ color: 'var(--text-muted)', marginBottom: '1rem', opacity: 0.5 }} />
+                    <p style={{ color: 'var(--text-muted)' }}>No past analyses found. Run your first analysis!</p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+                    {analysisHistory.map((a, i) => (
+                      <motion.div
+                        key={i}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.05 * i }}
+                        style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '20px', padding: '1.5rem 2rem' }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                          <div>
+                            <h3 style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-main)', marginBottom: '0.3rem' }}>{a.name || 'Land Analysis'}</h3>
+                            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><MapPin size={14} /> {a.district}, {a.taluka}</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Layers size={14} /> {a.area} acres · {a.soilType}</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Droplets size={14} /> {a.irrigationType || 'N/A'}</span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Sprout size={14} /> {a.season}</span>
+                            </div>
+                          </div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>
+                            {new Date(a.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          </div>
+                        </div>
+                        
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                          {a.recommendations.map((rec, j) => (
+                            <div key={j} style={{ background: 'var(--bg-main)', border: '1px solid var(--grid-line)', borderRadius: '14px', padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+                              <span style={{ fontSize: '2rem' }}>{rec.icon}</span>
+                              <div>
+                                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>#{rec.rank} {rec.name}</div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.2rem' }}>
+                                  <span style={{
+                                    padding: '0.1rem 0.5rem', borderRadius: '99px', fontSize: '0.7rem', fontWeight: 700,
+                                    background: rec.risk.color + '15', color: rec.risk.color, border: `1px solid ${rec.risk.color}30`
+                                  }}>
+                                    {rec.risk.level}
+                                  </span>
+                                  <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600 }}>
+                                    {formatCurrency(rec.revenueMin)}–{formatCurrency(rec.revenueMax)}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
+            )}
 
-          {activeTab === 'listings' && <LandListings user={user} />}
-          {activeTab === 'requests' && <div><h2>My Requests</h2><p>Lease requests management coming soon.</p></div>}
-          {activeTab === 'transactions' && <AdminDashboard />}
+            {/* ─── VERIFICATION TAB ─── */}
+            {activeTab === 'verification' && (
+              <motion.div key="verification" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-main)' }}>Verification Center</h2>
+                <div style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '20px', padding: '2rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                    <ShieldCheck size={32} color={isVerified ? 'var(--primary)' : 'var(--text-muted)'} />
+                    <div>
+                      <h3 style={{ fontWeight: 700 }}>{isVerified ? 'Identity Verified' : 'Verification Pending'}</h3>
+                      <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+                        {isVerified ? 'Your identity has been verified. You can list lands and sign agreements.' : 'Upload your Aadhaar/PAN documents to complete verification.'}
+                      </p>
+                    </div>
+                  </div>
+                  {!isVerified && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                      <div style={{ background: 'var(--bg-main)', border: '1px dashed var(--grid-line)', borderRadius: '12px', padding: '2rem', textAlign: 'center', cursor: 'pointer' }}>
+                        <FileText size={32} color="var(--text-muted)" style={{ marginBottom: '0.5rem' }} />
+                        <p style={{ fontWeight: 600 }}>Upload Aadhaar</p>
+                      </div>
+                      <div style={{ background: 'var(--bg-main)', border: '1px dashed var(--grid-line)', borderRadius: '12px', padding: '2rem', textAlign: 'center', cursor: 'pointer' }}>
+                        <FileText size={32} color="var(--text-muted)" style={{ marginBottom: '0.5rem' }} />
+                        <p style={{ fontWeight: 600 }}>Upload PAN</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
 
+            {/* ─── MY LANDS TAB ─── */}
+            {activeTab === 'lands' && (
+              <motion.div key="lands" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <LandListings />
+              </motion.div>
+            )}
+
+            {/* ─── REQUESTS TAB ─── */}
+            {activeTab === 'requests' && (
+              <motion.div key="requests" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <h2 style={{ fontSize: '1.8rem', fontWeight: 700, marginBottom: '1.5rem', color: 'var(--text-main)' }}>My Requests</h2>
+                <div style={{ background: 'var(--bg-card)', border: '1px solid var(--grid-line)', borderRadius: '20px', padding: '3rem', textAlign: 'center' }}>
+                  <MapPin size={48} style={{ color: 'var(--text-muted)', marginBottom: '1rem', opacity: 0.5 }} />
+                  <p style={{ color: 'var(--text-muted)' }}>No lease requests yet. Browse lands in Discovery to send a request.</p>
+                  <Link to="/discovery" className="btn-secondary" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginTop: '1rem' }}>
+                    Explore Lands
+                  </Link>
+                </div>
+              </motion.div>
+            )}
+
+            {/* ─── TRANSACTIONS / ADMIN TAB ─── */}
+            {(activeTab === 'transactions' || activeTab === 'admin') && (
+              <motion.div key="transactions" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <AdminDashboard />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </motion.div>
-  );
-};
-
-// Extracted Component for Verification
-const VerificationPanel = ({ user, setUser }) => {
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-
-  const handleUpload = () => {
-    if (!file) return;
-    setUploading(true);
-    setUploading(false);
-    const updatedUser = { ...user, isVerified: true };
-    setUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
-    alert("Documents verified successfully!");
-  };
-
-  if (user.isVerified) {
-    return (
-      <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-        <CheckCircle size={64} style={{ color: 'var(--primary-glow)', margin: '0 auto 1.5rem' }} />
-        <h2>Identity Verified</h2>
-        <p style={{ color: 'var(--text-muted)', marginTop: '1rem', maxWidth: '400px', margin: '1rem auto' }}>
-          Your Aadhaar and PAN documents have been successfully verified. You can now list lands on the platform.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <h2 style={{ marginBottom: '1.5rem', color: 'var(--primary-glow)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-        <AlertTriangle size={24} color="#facc15" /> Identity Verification Required
-      </h2>
-      <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>
-        To ensure trust across the AgriLease platform, all landowners must verify their identity before listing lands.
-      </p>
-
-      <div className="glass-card" style={{ padding: '3rem 2rem', borderStyle: 'dashed', borderWidth: '2px', borderColor: 'var(--grid-line)', background: 'transparent', textAlign: 'center', marginBottom: '2rem' }}>
-        <Upload size={48} style={{ color: 'var(--text-muted)', margin: '0 auto 1rem' }} />
-        <h3>Upload Documents</h3>
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginTop: '0.5rem', marginBottom: '1.5rem' }}>
-          Please upload a clear image or PDF of your Aadhaar card or PAN card.
-        </p>
-        
-        <input 
-          type="file" 
-          id="file-upload" 
-          style={{ display: 'none' }} 
-          onChange={(e) => setFile(e.target.files[0])}
-        />
-        <label htmlFor="file-upload" className="btn-secondary" style={{ display: 'inline-block' }}>
-          Choose File
-        </label>
-        
-        {file && (
-          <div style={{ marginTop: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', color: 'var(--text-main)' }}>
-            <FileText size={18} /> {file.name}
-          </div>
-        )}
-      </div>
-
-      <button 
-        className="btn-primary" 
-        style={{ width: '100%' }} 
-        disabled={!file || uploading}
-        onClick={handleUpload}
-      >
-        {uploading ? 'Verifying...' : 'Submit for Verification'}
-      </button>
-    </div>
   );
 };
 
